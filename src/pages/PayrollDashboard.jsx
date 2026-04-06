@@ -1,0 +1,24 @@
+import React from 'react';
+
+const PayrollDashboard = () => {
+    return (
+        <div className="p-8">
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">Payroll Dashboard</h1>
+            <p className="text-gray-600">Welcome to the Payroll Officer Dashboard.</p>
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-bold mb-2">Upload Wages</h2>
+                    <p className="text-gray-500 mb-4">Upload monthly wage data via Excel.</p>
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded">Go to Upload</button>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-bold mb-2">Process PF</h2>
+                    <p className="text-gray-500 mb-4">Calculate and finalize PF records.</p>
+                    <button className="bg-green-600 text-white px-4 py-2 rounded">Go to Process</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default PayrollDashboard;
