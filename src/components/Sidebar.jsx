@@ -17,18 +17,20 @@ const Sidebar = () => {
     const menuItems = {
         Admin: [
             { name: 'Users', icon: '👥', path: '/users' },
-            { name: 'Roles & Permissions', icon: '🛡️', path: '/users' }, // Reuse users page for now or separate
-            { name: 'Login Logs', icon: '📜', path: '/logs' }
+            { name: 'Roles & Permissions', icon: '🛡️', path: '/users' },
+            { name: 'Logs', icon: '📜', path: '/logs' }
         ],
         PayrollOfficer: [
             { name: 'Dashboard', icon: '📊', path: '/payroll' },
             { name: 'Upload Wages', icon: '📤', path: '/payroll/upload' },
             { name: 'Process PF', icon: '⚙️', path: '/payroll/process' },
-            { name: 'My PF', icon: '💰', path: '/my-pf' }
+            { name: 'Manage PF', icon: '💰', path: '/payroll/manage-pf' },
+            { name: 'PF Requests', icon: '📋', path: '/payroll/requests' }
         ],
         Staff: [
             { name: 'My PF', icon: '💰', path: '/my-pf' },
-            { name: 'Profile', icon: '👤', path: '/my-pf' } // Profile can be same as My PF for now
+            { name: 'Profile', icon: '👤', path: '/profile' },
+            { name: 'Settings', icon: '⚙️', path: '/profile/settings' }
         ]
     };
 

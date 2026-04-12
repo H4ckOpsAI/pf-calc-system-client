@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const PayrollDashboard = () => {
     return (
@@ -9,12 +10,17 @@ const PayrollDashboard = () => {
                 <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-xl font-bold mb-2">Upload Wages</h2>
                     <p className="text-gray-500 mb-4">Upload monthly wage data via Excel.</p>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded">Go to Upload</button>
+                    <Link to="/payroll/upload" className="bg-blue-600 text-white px-4 py-2 rounded inline-block">Go to Upload</Link>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-xl font-bold mb-2">Process PF</h2>
                     <p className="text-gray-500 mb-4">Calculate and finalize PF records.</p>
-                    <button className="bg-green-600 text-white px-4 py-2 rounded">Go to Process</button>
+                    <Link to="/payroll/process" className="bg-green-600 text-white px-4 py-2 rounded inline-block">Go to Process</Link>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-bold mb-2">Manage PF Requests</h2>
+                    <p className="text-gray-500 mb-4">Review and approve override/withdrawal requests.</p>
+                    <Link to="/payroll/manage-pf" className="bg-purple-600 text-white px-4 py-2 rounded inline-block">Manage Requests</Link>
                 </div>
             </div>
         </div>

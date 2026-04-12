@@ -6,7 +6,10 @@ import AdminDashboard from './pages/AdminDashboard';
 import PayrollDashboard from './pages/PayrollDashboard';
 import UploadPayroll from './pages/UploadPayroll';
 import ProcessPayroll from './pages/ProcessPayroll';
+import ManagePF from './pages/ManagePF';
+import PFRequests from './pages/PFRequests';
 import MyPF from './pages/MyPF';
+import Settings from './pages/Settings';
 import Unauthorized from './pages/Unauthorized';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -45,6 +48,8 @@ function App() {
               <Route path="/payroll" element={<PayrollDashboard />} />
               <Route path="/payroll/upload" element={<UploadPayroll />} />
               <Route path="/payroll/process" element={<ProcessPayroll />} />
+              <Route path="/payroll/manage-pf" element={<ManagePF />} />
+              <Route path="/payroll/requests" element={<PFRequests />} />
             </Route>
 
             {/* Staff Routes (My PF) - Accessible to everyone basically, but logic inside MyPF handles data */}
@@ -52,9 +57,10 @@ function App() {
               <Route path="/my-pf" element={<MyPF />} />
             </Route>
 
-            {/* Profile - Placeholder */}
+            {/* Profile & Settings routes */}
             <Route element={<ProtectedRoute allowedRoles={['Staff', 'PayrollOfficer', 'Admin']} />}>
               <Route path="/profile" element={<div className="p-8">User Profile (Coming Soon)</div>} />
+              <Route path="/profile/settings" element={<Settings />} />
             </Route>
           </Route>
 

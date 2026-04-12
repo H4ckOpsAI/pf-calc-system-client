@@ -12,7 +12,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         if (activeTab === 'users') fetchUsers();
         if (activeTab === 'permissions') fetchPermissions();
-        // if (activeTab === 'logs') fetchLogs(); // Placeholder for logs
+        if (activeTab === 'logs') fetchLogs();
     }, [activeTab]);
 
     const fetchUsers = async () => {
@@ -28,6 +28,15 @@ const AdminDashboard = () => {
         try {
             const res = await api.get('/users/permissions');
             setPermissions(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchLogs = async () => {
+        try {
+            const res = await api.get('/users/logs');
+            setLogs(res.data);
         } catch (error) {
             console.error(error);
         }
@@ -236,6 +245,38 @@ const AdminDashboard = () => {
                                                         className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                                     />
                                                 </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                    {activeTab === 'logs' && (
+                        <div className="animate-fade-in">
+                            <h3 className="text-xl font-bold text-gray-800 mb-6">Activity Logs</h3>
+                            <div className="overflow-x-auto rounded-xl border border-gray-200">
+                                <table className="min-w-full leading-normal">
+                                    <thead>
+                                        <tr>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Time</th>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Role</th>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white">
+                                        {logs.map(log => (
+                                            <tr key={log._id} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm text-gray-600">{new Date(log.timestamp).toLocaleString()}</td>
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm font-medium text-gray-800">
+                                                    {log.userId ? log.userId.name : 'Unknown'}
+                                                    {log.userId && <span className="block text-xs text-gray-500">{log.userId.employeeId}</span>}
+                                                </td>
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm text-gray-600">{log.role}</td>
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm font-bold text-blue-600">{log.action}</td>
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm text-gray-600">{log.details}</td>
                                             </tr>
                                         ))}
                                     </tbody>
