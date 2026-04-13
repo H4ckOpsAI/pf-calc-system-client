@@ -23,7 +23,18 @@ const Login = () => {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-500 to-purple-600">
+        <div className="flex flex-col justify-center items-center h-screen bg-gradient-to-br from-blue-500 to-purple-600">
+            {/* Project Title */}
+            <div className="mb-8 text-center">
+                <h1 className="text-white text-2xl md:text-3xl font-extrabold tracking-wide uppercase drop-shadow-lg">
+                    Constraint Based Dynamic
+                </h1>
+                <h1 className="text-white text-3xl md:text-4xl font-extrabold tracking-wide uppercase drop-shadow-lg mt-1">
+                    Provident Fund Calculation System
+                </h1>
+                <div className="mx-auto mt-3 w-24 h-1 bg-white/40 rounded-full"></div>
+            </div>
+
             <div className="bg-white p-10 rounded-xl shadow-2xl w-full max-w-md transform transition-all hover:scale-105">
                 <h2 className="text-3xl font-extrabold mb-6 text-center text-gray-800">Welcome Back</h2>
                 <p className="text-center text-gray-500 mb-8">Sign in to your account</p>
@@ -41,7 +52,10 @@ const Login = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="block text-gray-700 text-sm font-bold">Password</label>
+                            <Link to="/forgot-password" className="text-xs text-blue-600 hover:underline font-medium">Forgot Password?</Link>
+                        </div>
                         <input
                             type="password"
                             className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:border-blue-500 focus:bg-white focus:outline-none transition duration-200"

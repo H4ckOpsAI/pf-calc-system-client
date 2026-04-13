@@ -18,6 +18,7 @@ const Sidebar = () => {
         Admin: [
             { name: 'Users', icon: '👥', path: '/users' },
             { name: 'Roles & Permissions', icon: '🛡️', path: '/users' },
+            { name: 'Reports', icon: '📊', path: '/admin/reports' },
             { name: 'Logs', icon: '📜', path: '/logs' }
         ],
         PayrollOfficer: [
@@ -25,7 +26,8 @@ const Sidebar = () => {
             { name: 'Upload Wages', icon: '📤', path: '/payroll/upload' },
             { name: 'Process PF', icon: '⚙️', path: '/payroll/process' },
             { name: 'Manage PF', icon: '💰', path: '/payroll/manage-pf' },
-            { name: 'PF Requests', icon: '📋', path: '/payroll/requests' }
+            { name: 'PF Requests', icon: '📋', path: '/payroll/requests' },
+            { name: 'Reports', icon: '📑', path: '/admin/reports' }
         ],
         Staff: [
             { name: 'My PF', icon: '💰', path: '/my-pf' },
