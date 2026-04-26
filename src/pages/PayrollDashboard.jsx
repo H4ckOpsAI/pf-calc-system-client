@@ -9,8 +9,9 @@ const PayrollDashboard = () => {
     useEffect(() => {
         const fetchPFList = async () => {
             try {
-                const response = await api.get('/payroll/list');
-                setPfRecords(response.data);
+                const response = await api.get('/pf-tax/all-details');
+                const sorted = response.data.sort((a, b) => b.pf_amount - a.pf_amount);
+                setPfRecords(sorted);
             } catch (error) {
                 console.error("Error fetching PF records", error);
             } finally {
@@ -54,15 +55,15 @@ const PayrollDashboard = () => {
                         {pfRecords.length > 0 && (
                             <div className="flex flex-col md:flex-row justify-between items-center bg-gray-50 p-6 border-b border-gray-200">
                                 <div className="text-center md:text-left mb-4 md:mb-0">
-                                    <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider">Maximum PF Amount</p>
+                                    <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider">Maximum Cumulative PF</p>
                                     <p className="text-2xl font-bold text-gray-800">
-                                        ₹{maxPFRecord.totalPF.toLocaleString()} <span className="text-sm font-medium text-gray-500">({maxPFRecord.staffName})</span>
+                                        ₹{maxPFRecord.pf_amount.toLocaleString()} <span className="text-sm font-medium text-gray-500">({maxPFRecord.user_id?.name})</span>
                                     </p>
                                 </div>
                                 <div className="text-center md:text-right">
-                                    <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider">Minimum PF Amount</p>
+                                    <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider">Minimum Cumulative PF</p>
                                     <p className="text-2xl font-bold text-gray-800">
-                                        ₹{minPFRecord.totalPF.toLocaleString()} <span className="text-sm font-medium text-gray-500">({minPFRecord.staffName})</span>
+                                        ₹{minPFRecord.pf_amount.toLocaleString()} <span className="text-sm font-medium text-gray-500">({minPFRecord.user_id?.name})</span>
                                     </p>
                                 </div>
                             </div>
@@ -73,29 +74,31 @@ const PayrollDashboard = () => {
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Staff Name</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee ID</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month/Year</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total PF</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax (3% / None)</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cumulative Total PF</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Bracket</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net PF</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {pfRecords.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-8 text-center text-gray-500">No PF records found. Process payroll first.</td>
+                                            <td colSpan="5" className="px-6 py-8 text-center text-gray-500">No cumulative PF records found.</td>
                                         </tr>
                                     ) : (
                                         pfRecords.map((record) => (
                                             <tr key={record._id} className="hover:bg-gray-50 transition duration-150">
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{record.staffName}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.employeeId}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.month}/{record.year}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">₹{record.totalPF.toLocaleString()}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{record.user_id?.name}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.user_id?.employeeId}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">₹{record.pf_amount.toLocaleString()}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    {record.tax === null ? (
-                                                        <span className="text-gray-400 italic bg-gray-100 px-3 py-1 rounded border border-gray-200 shadow-inner inline-block min-w-[60px] text-center" title="No tax needed as PF is > 7.5L">&nbsp;</span>
+                                                    {record.tax_percentage === 0 ? (
+                                                        <span className="text-gray-400 italic bg-gray-100 px-3 py-1 rounded border border-gray-200 shadow-inner inline-block min-w-[60px] text-center" title="No tax needed as PF is < 7L">&nbsp;</span>
                                                     ) : (
-                                                        <span className="text-red-600 font-semibold bg-red-50 px-2 py-1 rounded">₹{record.tax} (3%)</span>
+                                                        <span className="text-red-600 font-semibold bg-red-50 px-2 py-1 rounded">₹{record.tax_amount.toLocaleString()} ({record.tax_percentage}%)</span>
                                                     )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
+                                                    ₹{record.net_pf.toLocaleString()}
                                                 </td>
                                             </tr>
                                         ))
