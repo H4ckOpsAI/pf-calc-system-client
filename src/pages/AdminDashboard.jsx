@@ -6,6 +6,8 @@ const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [permissions, setPermissions] = useState([]);
     const [logs, setLogs] = useState([]);
+    const [taxDetails, setTaxDetails] = useState([]);
+    const [taxFilter, setTaxFilter] = useState('All');
     const [showUserModal, setShowUserModal] = useState(false);
     const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'Staff', employeeId: '', designation: '', department: '', staffCategory: 'Teaching', pfScheme: 'CPF' });
 
@@ -13,7 +15,17 @@ const AdminDashboard = () => {
         if (activeTab === 'users') fetchUsers();
         if (activeTab === 'permissions') fetchPermissions();
         if (activeTab === 'logs') fetchLogs();
+        if (activeTab === 'tax') fetchTaxDetails();
     }, [activeTab]);
+
+    const fetchTaxDetails = async () => {
+        try {
+            const res = await api.get('/pf-tax/all-details');
+            setTaxDetails(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const fetchUsers = async () => {
         try {
@@ -122,6 +134,12 @@ const AdminDashboard = () => {
                         onClick={() => setActiveTab('logs')}
                     >
                         System Logs
+                    </button>
+                    <button
+                        className={`px-8 py-4 font-semibold text-sm transition-all duration-300 ${activeTab === 'tax' ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                        onClick={() => setActiveTab('tax')}
+                    >
+                        PF Tax & Limits
                     </button>
                 </div>
 
@@ -277,6 +295,62 @@ const AdminDashboard = () => {
                                                 <td className="px-6 py-4 border-b border-gray-100 text-sm text-gray-600">{log.role}</td>
                                                 <td className="px-6 py-4 border-b border-gray-100 text-sm font-bold text-blue-600">{log.action}</td>
                                                 <td className="px-6 py-4 border-b border-gray-100 text-sm text-gray-600">{log.details}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                    {activeTab === 'tax' && (
+                        <div className="animate-fade-in">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-bold text-gray-800">PF Tax & Increment Usage</h3>
+                                <select
+                                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none"
+                                    value={taxFilter}
+                                    onChange={(e) => setTaxFilter(e.target.value)}
+                                >
+                                    <option value="All">All Users</option>
+                                    <option value="7%">7% Tax Slab</option>
+                                    <option value="5%">5% Tax Slab</option>
+                                    <option value="3%">3% Tax Slab</option>
+                                </select>
+                            </div>
+                            <div className="overflow-x-auto rounded-xl border border-gray-200">
+                                <table className="min-w-full leading-normal">
+                                    <thead>
+                                        <tr>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">PF Amount</th>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Net PF</th>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tax Slab</th>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tax Amount</th>
+                                            <th className="px-6 py-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Increments Used</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white">
+                                        {taxDetails.filter(t => {
+                                            if (taxFilter === 'All') return true;
+                                            if (taxFilter === '7%') return t.tax_percentage === 7;
+                                            if (taxFilter === '5%') return t.tax_percentage === 5;
+                                            if (taxFilter === '3%') return t.tax_percentage === 3;
+                                            return true;
+                                        }).map(detail => (
+                                            <tr key={detail._id} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm font-medium text-gray-800">
+                                                    {detail.user_id?.name}
+                                                    <span className="block text-xs text-gray-500">{detail.user_id?.email}</span>
+                                                </td>
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm text-gray-600">₹{detail.pf_amount.toLocaleString()}</td>
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm font-bold text-green-600">₹{detail.net_pf.toLocaleString()}</td>
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm font-bold text-gray-800">{detail.tax_percentage}%</td>
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm font-bold text-red-500">₹{detail.tax_amount.toLocaleString()}</td>
+                                                <td className="px-6 py-4 border-b border-gray-100 text-sm">
+                                                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${detail.increments_used >= 3 ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`}>
+                                                        {detail.increments_used} / 3
+                                                    </span>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>

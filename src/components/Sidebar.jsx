@@ -19,7 +19,8 @@ const Sidebar = () => {
             { name: 'Users', icon: '👥', path: '/users' },
             { name: 'Roles & Permissions', icon: '🛡️', path: '/users' },
             { name: 'Reports', icon: '📊', path: '/admin/reports' },
-            { name: 'Logs', icon: '📜', path: '/logs' }
+            { name: 'Logs', icon: '📜', path: '/logs' },
+            { name: 'Resume Compare', icon: '📝', path: '/resume-compare' }
         ],
         PayrollOfficer: [
             { name: 'Dashboard', icon: '📊', path: '/payroll' },
@@ -27,12 +28,14 @@ const Sidebar = () => {
             { name: 'Process PF', icon: '⚙️', path: '/payroll/process' },
             { name: 'Manage PF', icon: '💰', path: '/payroll/manage-pf' },
             { name: 'PF Requests', icon: '📋', path: '/payroll/requests' },
-            { name: 'Reports', icon: '📑', path: '/admin/reports' }
+            { name: 'Reports', icon: '📑', path: '/admin/reports' },
+            { name: 'Resume Compare', icon: '📝', path: '/resume-compare' }
         ],
         Staff: [
             { name: 'My PF', icon: '💰', path: '/my-pf' },
             { name: 'Profile', icon: '👤', path: '/profile' },
-            { name: 'Settings', icon: '⚙️', path: '/profile/settings' }
+            { name: 'Settings', icon: '⚙️', path: '/profile/settings' },
+            { name: 'Resume Compare', icon: '📝', path: '/resume-compare' }
         ]
     };
 

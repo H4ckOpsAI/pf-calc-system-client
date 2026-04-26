@@ -18,6 +18,7 @@ import Settings from './pages/Settings';
 import Unauthorized from './pages/Unauthorized';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ResumeComparison from './pages/ResumeComparison';
 
 const HomeRedirect = () => {
   const { user } = useAuth();
@@ -69,6 +70,7 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={['Staff', 'PayrollOfficer', 'Admin']} />}>
               <Route path="/profile" element={<Profile />} />
               <Route path="/profile/settings" element={<Settings />} />
+              <Route path="/resume-compare" element={<ResumeComparison />} />
             </Route>
           </Route>
 

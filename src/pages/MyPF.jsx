@@ -9,6 +9,8 @@ const MyPF = () => {
     const [overrideForm, setOverrideForm] = useState({ type: 'increase', amount: '' });
     const [withdrawForm, setWithdrawForm] = useState({ type: 'part-final', amount: '' });
     const [actionMsg, setActionMsg] = useState('');
+    const [cooldownUntil, setCooldownUntil] = useState(null);
+    const [taxDetails, setTaxDetails] = useState(null);
 
     useEffect(() => {
         const fetchMyPF = async () => {
@@ -17,6 +19,23 @@ const MyPF = () => {
                 setPfData(res.data);
                 const actRes = await api.get('/actions/my-actions');
                 setActions(actRes.data);
+
+                // Fetch Tax details
+                try {
+                    const taxRes = await api.get('/pf-tax/my-details');
+                    setTaxDetails(taxRes.data);
+                } catch (e) {
+                    console.error('Error fetching tax details', e);
+                }
+
+                // Determine cooldown from latest approved/processed withdrawal
+                const processed = (actRes.data.withdrawals || []).filter(w => (w.status === 'approved' || w.status === 'processed') && w.cooldownUntil);
+                if (processed.length > 0) {
+                    const latest = processed.sort((a, b) => new Date(b.approvedAt) - new Date(a.approvedAt))[0];
+                    if (new Date() < new Date(latest.cooldownUntil)) {
+                        setCooldownUntil(new Date(latest.cooldownUntil));
+                    }
+                }
             } catch (err) {
                 setError(err.response?.data?.message || 'Failed to fetch PF data');
             } finally {
@@ -83,7 +102,7 @@ const MyPF = () => {
         if (ov.type === 'decrease' && ov.status !== 'rejected') decreaseCount++;
     });
 
-    const remainingIncreases = Math.max(0, 2 - increaseCount);
+    const remainingIncreases = Math.max(0, 3 - increaseCount);
     const remainingDecreases = Math.max(0, 1 - decreaseCount);
 
     const canIncrease = remainingIncreases > 0;
@@ -112,6 +131,34 @@ const MyPF = () => {
                     </div>
                 </div>
             </div>
+
+            {/* PF Tax & Rules Card */}
+            {taxDetails && (
+                <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 mb-8">
+                    <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        PF Tax Summary
+                    </h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <p className="text-sm font-medium text-gray-500 mb-1">Cumulative Total PF</p>
+                            <p className="text-xl font-bold text-gray-800">₹ {taxDetails.pfTaxDetail.pf_amount.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <p className="text-sm font-medium text-gray-500 mb-1">Tax Slab Applied</p>
+                            <p className="text-xl font-bold text-gray-800">{taxDetails.pfTaxDetail.tax_percentage}%</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <p className="text-sm font-medium text-gray-500 mb-1">Cumulative Tax Amount</p>
+                            <p className="text-xl font-bold text-red-500">₹ {taxDetails.pfTaxDetail.tax_amount.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <p className="text-sm font-medium text-gray-500 mb-1">Increments Used</p>
+                            <p className="text-xl font-bold text-blue-600">{taxDetails.incrementsUsed} / 3</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* PF Records Table */}
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
@@ -230,13 +277,28 @@ const MyPF = () => {
                 {/* Withdrawal Form */}
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
                     <h3 className="text-xl font-bold text-gray-800 mb-4">Request Withdrawal</h3>
+
+                    {cooldownUntil ? (
+                        <div className="bg-amber-50 border border-amber-300 text-amber-800 rounded-xl p-4 mb-4">
+                            <p className="font-bold text-sm">🔒 Withdrawal Locked</p>
+                            <p className="text-sm mt-1">
+                                You can withdraw again after{' '}
+                                <span className="font-bold">
+                                    {cooldownUntil.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                </span>
+                            </p>
+                        </div>
+                    ) : null}
+
                     <form onSubmit={handleWithdrawSubmit} className="space-y-4">
-                        <select className="w-full px-4 py-2 border rounded-lg" value={withdrawForm.type} onChange={e => setWithdrawForm({...withdrawForm, type: e.target.value})}>
-                            <option value="part-final">Part-Final (Max 80%)</option>
+                        <select disabled={!!cooldownUntil} className="w-full px-4 py-2 border rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed" value={withdrawForm.type} onChange={e => setWithdrawForm({...withdrawForm, type: e.target.value})}>
+                            <option value="part-final">Part-Final (Max 70%)</option>
                             <option value="advance">Advance (36 Months EMI)</option>
                         </select>
-                        <input type="number" placeholder="Amount (₹)" className="w-full px-4 py-2 border rounded-lg" required value={withdrawForm.amount} onChange={e => setWithdrawForm({...withdrawForm, amount: e.target.value})} />
-                        <button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg">Submit Withdrawal</button>
+                        <input disabled={!!cooldownUntil} type="number" placeholder="Amount (₹)" className="w-full px-4 py-2 border rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed" required value={withdrawForm.amount} onChange={e => setWithdrawForm({...withdrawForm, amount: e.target.value})} />
+                        <button disabled={!!cooldownUntil} type="submit" className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg">
+                            {cooldownUntil ? 'Withdrawal Locked' : 'Submit Withdrawal'}
+                        </button>
                     </form>
                     
                     <h4 className="mt-6 font-bold text-gray-700">Withdrawal History</h4>
